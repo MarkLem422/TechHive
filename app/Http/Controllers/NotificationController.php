@@ -110,8 +110,13 @@ class NotificationController extends Controller
         return back()->with('success', 'All notifications marked as read.');
     }
 
-    public function getUnreadCount()
+    public function getUnreadCount(Request $request)
     {
+        // Only allow AJAX requests to prevent direct access showing JSON
+        if (!$request->ajax() && !$request->wantsJson()) {
+            return redirect()->route('dashboard');
+        }
+
         if (!Auth::check()) {
             return response()->json(['count' => 0]);
         }
@@ -133,8 +138,13 @@ class NotificationController extends Controller
         return response()->json(['count' => $count]);
     }
 
-    public function getLatest()
+    public function getLatest(Request $request)
     {
+        // Only allow AJAX requests to prevent direct access showing JSON
+        if (!$request->ajax() && !$request->wantsJson()) {
+            return redirect()->route('dashboard');
+        }
+
         if (!Auth::check()) {
             return response()->json(['notifications' => []]);
         }

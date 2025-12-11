@@ -89,12 +89,22 @@
         }
 
         function loadNotifications() {
-            fetch('{{ route("notifications.latest") }}')
-                .then(response => response.json())
+            fetch('{{ route("notifications.latest") }}', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     const list = document.getElementById('notification-list');
                     
-                    if (data.notifications.length === 0) {
+                    if (!data || !data.notifications || data.notifications.length === 0) {
                         list.innerHTML = '<div class="p-4 text-center text-sm text-[#706f6c]">No notifications</div>';
                         return;
                     }
@@ -126,14 +136,28 @@
                 })
                 .catch(error => {
                     console.error('Error loading notifications:', error);
+                    const list = document.getElementById('notification-list');
+                    if (list) {
+                        list.innerHTML = '<div class="p-4 text-center text-sm text-[#706f6c]">Unable to load notifications</div>';
+                    }
                 });
         }
 
         function checkForNewNotifications() {
-            fetch('{{ route("notifications.latest") }}')
-                .then(response => response.json())
+            fetch('{{ route("notifications.latest") }}', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    if (data.notifications.length > 0) {
+                    if (data && data.notifications && data.notifications.length > 0) {
                         const latest = data.notifications[0];
                         
                         // Check if this is a new notification we haven't shown yet
@@ -154,15 +178,27 @@
         }
 
         function updateBadge() {
-            fetch('{{ route("notifications.unread-count") }}')
-                .then(response => response.json())
+            fetch('{{ route("notifications.unread-count") }}', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     const badge = document.getElementById('notification-badge');
-                    if (data.count > 0) {
-                        badge.textContent = data.count > 99 ? '99+' : data.count;
-                        badge.classList.remove('hidden');
-                    } else {
-                        badge.classList.add('hidden');
+                    if (badge && data && typeof data.count !== 'undefined') {
+                        if (data.count > 0) {
+                            badge.textContent = data.count > 99 ? '99+' : data.count;
+                            badge.classList.remove('hidden');
+                        } else {
+                            badge.classList.add('hidden');
+                        }
                     }
                 })
                 .catch(error => {
