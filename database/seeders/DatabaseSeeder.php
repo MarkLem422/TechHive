@@ -17,32 +17,27 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Seller Account',
-            'email' => 'seller@example.com',
-            'role' => 'seller',
-            'password' => 'password',
+        User::firstOrCreate(
+            ['email' => 'seller@example.com'],
+            [
+                'name' => 'Seller Account',
+                'role' => 'seller',
+                'password' => bcrypt('password'),
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'buyer@example.com'],
+            [
+                'name' => 'Buyer Account',
+                'role' => 'buyer',
+                'password' => bcrypt('password'),
+            ]
+        );
+
+        // Call the EcommerceSeeder
+        $this->call([
+            EcommerceSeeder::class,
         ]);
-
-        User::factory()->create([
-            'name' => 'Buyer Account',
-            'email' => 'buyer@example.com',
-            'role' => 'buyer',
-            'password' => 'password',
-        ]);
-
-        $defaultCategories = [
-            ['category_name' => 'Mobile Phones', 'description' => 'Smartphones and mobile devices'],
-            ['category_name' => 'Laptop', 'description' => 'Notebooks and ultrabooks'],
-            ['category_name' => 'Smart Watch', 'description' => 'Wearables and smartwatches'],
-            ['category_name' => 'Earbuds', 'description' => 'Wireless and wired earbuds'],
-        ];
-
-        foreach ($defaultCategories as $category) {
-            \App\Models\Category::firstOrCreate(
-                ['category_name' => $category['category_name']],
-                ['description' => $category['description']]
-            );
-        }
     }
 }
